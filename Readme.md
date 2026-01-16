@@ -71,132 +71,120 @@ Each workflow is composed of nodes:
 ```mermaid
 
 %%{init: {
-  'theme': 'base',
   'themeVariables': {
     'fontSize': '16px',
     'fontFamily': 'Segoe UI, Arial',
-
-    /* TEXT COLORS */
-    'primaryTextColor': '#000000',
-    'secondaryTextColor': '#000000',
-    'tertiaryTextColor': '#000000',
-
-    /* NODE & EDGE */
-    'primaryColor': '#F5F7FA',
-    'primaryBorderColor': '#111827',
-    'lineColor': '#111827',
-    'edgeLabelBackground': '#ffffff',
-
-    /* SUBGRAPH */
-    'clusterBorder': '#111827',
-    'clusterBkg': '#ffffff',
-
-    /* TITLES */
-    'titleColor': '#000000'
+    'primaryTextColor': '#111',
+    'textColor': '#111', 
+    'nodeTextColor': '#111',
+    'edgeLabelBackground':'#fff',
+    'titleColor': '#111'
   },
-  'flowchart': {
+  'flowchart': { 
     'htmlLabels': true,
     'curve': 'monotoneX'
   }
 }}%%
-
 flowchart LR
 
 %% =========== FRONTEND =============
-subgraph FE["🖥️ **Frontend (Vue.js No-Code Builder)**"]
+subgraph FE["<b style='color:#111'>🖥️ Frontend (Vue.js No-Code Builder)</b>"]
   direction TB
-  NP["Node Panel\n*Drag/Drop Agents, Tools, Inputs*"]
-  CANVAS["Workflow Canvas\n*Main visual editing area*"]
-  EXEC["Execution Panel\n*Run, View Results & Logs*"]
-  WM["Workflow Manager\n*Save, Load, Share*"]
+  NP@{shape:notch-rect,label:"<b>Node Panel</b><br><span style='color:#222'>Drag/Drop Agents, Tools, Inputs</span>"}
+  CANVAS@{shape:notch-rect,label:"<b>Workflow Canvas</b><br><span style='color:#222'>Main visual editing area</span>"}
+  EXEC@{shape:notch-rect,label:"<b>Execution Panel</b><br><span style='color:#222'>Run, View Results & Logs</span>"}
+  WM@{shape:notch-rect,label:"<b>Workflow Manager</b><br><span style='color:#222'>Save, Load, Share</span>"}
 end
-classDef front fill:#DFE8FB,stroke:#2563eb,stroke-width:2px;
+classDef front fill:#F1F5FF,stroke:#2563eb,stroke-width:2px,color:#111;
+
 class NP,CANVAS,EXEC,WM front;
 
 %% =========== BACKEND =============
-subgraph BE["🛡️ **Backend (FastAPI)**"]
+subgraph BE["<b style='color:#111'>🛡️ Backend (FastAPI)</b>"]
   direction TB
-  API["FastAPI Application\n*REST interface, Auth, Validation*"]
-  REG["Node Registry\n*Central Node Definitions*"]
-  ENG["Workflow Engine\n*Execution logic, DAG processing*"]
+  API@{shape:rect,label:"<b>FastAPI Application</b><br><span style='color:#333'>REST API,<br>Auth, Validation</span>"}
+  REG@{shape:fr-rect,label:"<b>Node Registry</b><br><span style='color:#333'>Central Node Definitions</span>"}
+  ENG@{shape:rect,label:"<b>Workflow Engine</b><br><span style='color:#333'>Execution Logic<br>DAG Processing</span>"}
 end
-classDef back fill:#FDE68A,stroke:#B45309,stroke-width:2px;
+classDef back fill:#FEF3C7,stroke:#B45309,stroke-width:2px,color:#111;
 class API,REG,ENG back;
 
 %% =========== CORE =============
-subgraph CORE["⚙️ **Execution Core**"]
+subgraph CORE["<b style='color:#111'>⚙️ Execution Core</b>"]
   direction TB
-    INPUT["Input Node\n*Receives user/input data*"]
-    AGENTS["AI Agents\n*LLM/ Summarizer/ Guardrail*"]
-    TOOLS["Tools\n*Web Search/ Doc Extractor*"]
-    OUTPUT["Output Node\n*Final output/ results*"]
+    INPUT@{shape:lean-r,label:"<b>Input Node</b><br><span style='color:#323'>Receives user/Input data</span>"}
+    AGENTS@{shape:rounded,label:"<b>AI Agents</b><br><span style='color:#323'>LLM/Summarizer/Guardrail<br>Orchestration & Safety</span>"}
+    TOOLS@{shape:rounded,label:"<b>Tools</b><br><span style='color:#323'>Web Search/Doc Extractor</span>"}
+    OUTPUT@{shape:lean-l,label:"<b>Output Node</b><br><span style='color:#323'>Aggregate/Format results</span>"}
 end
-classDef core fill:#DEF7EC,stroke:#10B981,stroke-width:2px;
+classDef core fill:#DEF7EC,stroke:#10B981,stroke-width:2px,color:#111;
 class INPUT,AGENTS,TOOLS,OUTPUT core;
 
 %% =========== EXTERNAL SERVICES =============
-subgraph EXT["🌐 **External Services**"]
+subgraph EXT["<b style='color:#111'>🌐 External Services</b>"]
   direction TB
-  LLM["Gemini, OpenAI, etc.\n*LLM API*"]
-  WEB["DuckDuckGo\n*Web search*"]
-  DOC["Docling\n*PDF/Image/Text Extraction*"]
+  LLM@{shape:circle,label:"<b>LLM Provider</b><br><span style='color:#222'>Gemini, OpenAI, etc.</span>"}
+  WEB@{shape:circle,label:"<b>DuckDuckGo</b><br><span style='color:#222'>Web Search</span>"}
+  DOC@{shape:circle,label:"<b>Docling</b><br><span style='color:#222'>PDF/Image/Text Extraction</span>"}
 end
-classDef ext fill:#FECACA,stroke:#DC2626,stroke-width:2px;
+classDef ext fill:#FECACA,stroke:#DC2626,stroke-width:2px,color:#111;
 class LLM,WEB,DOC ext;
 
 %% =========== DATA FLOW =============
 
-%% User flow
-NP -- "Drag node" --> CANVAS
-CANVAS -- "Edit, arrange" --> EXEC
-WM -- "Save/Load" --> CANVAS
+NP -- "User drags node" --> CANVAS
+CANVAS -- "User edits workflow" --> EXEC
+WM -- "Save/Load Workflow" --> CANVAS
 
-%% API flow
-EXEC -- "POST /api/execute\n(run workflow)" --> API
-CANVAS -- "GET /api/nodes\n(fetch nodes)" --> API
-WM -- "POST /api/workflow\n(save/load workflow)" --> API
+EXEC -- "POST /api/execute<br><span style='color:#333'>(Run workflow)</span>" --> API
+CANVAS -- "GET /api/nodes<br><span style='color:#333'>(Fetch node types)</span>" --> API
+WM -- "POST /api/workflow<br><span style='color:#333'>(Save/Load workflow)</span>" --> API
 
-%% Backend logic
-API -- "Node type/schema request" --> REG
-API -- "Execute workflow" --> ENG
+API -- "Node meta/schema" --> REG
+API -- "Invoke workflow" --> ENG
 
-%% Internal workflow processing
 ENG --> INPUT
 INPUT -- "User/Input data" --> AGENTS
-AGENTS -- "LLM call, summarization/guardrail" --> TOOLS
-TOOLS -- "Tool result\n(Web search, doc extract)" --> AGENTS
+AGENTS -- "LLM<br>Summarize/Guard" --> TOOLS
+TOOLS -- "Tool result<br>Search/Extract" --> AGENTS
 AGENTS -- "Processed output" --> OUTPUT
 
-%% External calls
-AGENTS -- "Prompt & API call" --> LLM
-TOOLS -- "Web query" --> WEB
-TOOLS -- "Document ingest" --> DOC
+AGENTS -- "Prompt/API call" --> LLM
+TOOLS -- "Web Query" --> WEB
+TOOLS -- "Doc Ingest" --> DOC
 
-%% Result returns
-OUTPUT -- "Results & logs" --> EXEC
+OUTPUT -- "Results & Logs" --> EXEC
 
-%% Borders for clarity
-FE -.->|UI/API Integration| BE
-BE -.->|Job Execution| CORE
-CORE -.->|External API/Service Calls| EXT
+FE -.->|Interface/API Integration| BE
+BE -.->|Job/Orchestration| CORE
+CORE -.->|External APIs/Services| EXT
 
-%% =========== LEGEND ==============
-%% Optional: A legend can be provided for managers
+%% Subgraph border styles (bolder)
+style FE stroke-width:3px,stroke:#2563eb,fill:#F1F5FF,color:#111;
+style BE stroke-width:3px,stroke:#B45309,fill:#FEF3C7,color:#111;
+style CORE stroke-width:3px,stroke:#10B981,fill:#DEF7EC,color:#111;
+style EXT stroke-width:3px,stroke:#DC2626,fill:#FECACA,color:#111;
 
-%% Use comment blocks to keep them visually out of main graph
-%% You may uncomment the below legend and adjust style if you want it in-diagram
+%% Node border style for high visibility
+style NP stroke:#2563eb,stroke-width:2px,color:#111;
+style CANVAS stroke:#2563eb,stroke-width:2px,color:#111;
+style EXEC stroke:#2563eb,stroke-width:2px,color:#111;
+style WM stroke:#2563eb,stroke-width:2px,color:#111;
 
-%% subgraph LEGEND["Legend"]
-%%   LUI((UI Node)):::front
-%%   LSU((Server Node)):::back
-%%   LCORE((Core Logic)):::core
-%%   LEXT((External API)):::ext
-%%   LAPI("API Route")--->LUI
-%% end
+style API stroke:#B45309,stroke-width:2px,color:#111;
+style REG stroke:#B45309,stroke-width:2px,color:#111;
+style ENG stroke:#B45309,stroke-width:2px,color:#111;
 
-%% Notes:
-%% - Hover for tooltips (if supported by your viewer)
-%% - Color = domain; shape = function (card = UI, rectangle = service, circle = external API, parallelogram = I/O)
+style INPUT stroke:#10B981,stroke-width:2px,color:#111;
+style AGENTS stroke:#10B981,stroke-width:2px,color:#111;
+style TOOLS stroke:#10B981,stroke-width:2px,color:#111;
+style OUTPUT stroke:#10B981,stroke-width:2px,color:#111;
+
+style LLM stroke:#DC2626,stroke-width:2px,color:#111;
+style WEB stroke:#DC2626,stroke-width:2px,color:#111;
+style DOC stroke:#DC2626,stroke-width:2px,color:#111;
+
+%% TIP: All text is black for clarity. Border and fill provide type distinction.
 
 ```
 
