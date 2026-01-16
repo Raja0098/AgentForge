@@ -1,0 +1,68 @@
+# ===============================
+# Python
+# ===============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+venv/
+.env
+.env.*
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+
+# ===============================
+# FastAPI / Backend
+# ===============================
+uploads/
+*.log
+
+# SQLite (future use)
+*.db
+*.sqlite3
+
+# ===============================
+# Node / Frontend
+# ===============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+dist/
+.vite/
+
+# ===============================
+# Vue / Vite
+# ===============================
+*.local
+*.env.local
+*.env.development.local
+*.env.production.local
+
+# ===============================
+# OS / Editor
+# ===============================
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+
+# IntelliJ / PyCharm
+.idea/
+
+# ===============================
+# Git
+# ===============================
+*.swp
+*.swo

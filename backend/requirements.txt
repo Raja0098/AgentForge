@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+requests
+docling
+duckduckgo-search
+aiofiles  # For async file handling
+
+
