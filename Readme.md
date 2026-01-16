@@ -181,7 +181,7 @@ CORE -.->|External API/Service Calls| EXT
 %% - Hover for tooltips (if supported by your viewer)
 %% - Color = domain; shape = function (card = UI, rectangle = service, circle = external API, parallelogram = I/O)
 
-
+```
 
 ## 🚦 Current Status
 
