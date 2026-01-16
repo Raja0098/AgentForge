@@ -71,18 +71,35 @@ Each workflow is composed of nodes:
 ```mermaid
 
 %%{init: {
+  'theme': 'base',
   'themeVariables': {
     'fontSize': '16px',
-    'edgeLabelBackground':'#fff',
     'fontFamily': 'Segoe UI, Arial',
-    'clusterBorder': '#bbb',
-    'primaryColor': '#F5F7FA'
+
+    /* TEXT COLORS */
+    'primaryTextColor': '#000000',
+    'secondaryTextColor': '#000000',
+    'tertiaryTextColor': '#000000',
+
+    /* NODE & EDGE */
+    'primaryColor': '#F5F7FA',
+    'primaryBorderColor': '#111827',
+    'lineColor': '#111827',
+    'edgeLabelBackground': '#ffffff',
+
+    /* SUBGRAPH */
+    'clusterBorder': '#111827',
+    'clusterBkg': '#ffffff',
+
+    /* TITLES */
+    'titleColor': '#000000'
   },
-  'flowchart': { 
+  'flowchart': {
     'htmlLabels': true,
     'curve': 'monotoneX'
   }
 }}%%
+
 flowchart LR
 
 %% =========== FRONTEND =============
