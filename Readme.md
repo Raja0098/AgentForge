@@ -1,4 +1,8 @@
-AgentForge is a **full-stack AI workflow platform** consisting of:
+# 🚀 AgentForge  
+### A Visual No-Code Platform for Creating AI Workflows
+
+Build powerful AI agents and workflows **without writing a single line of code**.  
+This platform is designed for **business users, analysts, founders, and domain experts** who want to leverage AI using **logic and domain knowledge — not programming**.
 
 ### 🧠 Frontend (No-Code Visual Builder)
 - Visual **workflow canvas** with auto-connected nodes
