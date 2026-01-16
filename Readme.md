@@ -220,9 +220,10 @@ cd no-code-ui
 npm install
 npm run dev
 
+```
 
 # Screenshot
 
 
-<img width="1412" height="831" alt="screenshot" src="https://github.com/user-attachments/assets/1d3b0faf-80f6-4c23-a3f9-023014b5e22e" />
+<img width="1412" height="831" alt="screenshot" src="https://github.com/user-attachments/assets/bcabc908-82dc-49c3-bf7a-d9089ddc0963" />
 
