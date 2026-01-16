@@ -223,5 +223,6 @@ npm run dev
 
 # Screenshot
 
-<img width="1412" height="831" alt="Screenshot 2026-01-17 at 2 00 57 AM" src="https://github.com/user-attachments/assets/a4fa3490-3f76-4081-9204-0602249e24db" />
+
+<img width="1412" height="831" alt="screenshot" src="https://github.com/user-attachments/assets/1d3b0faf-80f6-4c23-a3f9-023014b5e22e" />
 
