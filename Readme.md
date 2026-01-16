@@ -203,3 +203,20 @@ style DOC stroke:#DC2626,stroke-width:2px,color:#111;
 -  User authentication
 -  Workflow export/import
 -  Cloud deployment support
+
+## 📦 Installation (Local)
+
+```bash
+# Backend
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+
+# Frontend
+cd frontend
+cd no-code-ui
+npm install
+npm run dev
+
