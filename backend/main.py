@@ -1,5 +1,17 @@
 # backend/main.py
 
+
+import torch
+
+# 🛡️ Safety Patch for Intel Macs
+# If 'xpu' is missing from torch, we create a fake version that 
+# just says "False" when asked if it's available.
+if not hasattr(torch, "xpu"):
+    class MockXPU:
+        def is_available(self): return False
+    torch.xpu = MockXPU()
+    print("ℹ️ Applied XPU safety patch for Intel Mac")
+
 """
 AI Agent Builder Backend
 ------------------------
@@ -11,6 +23,8 @@ FastAPI service that powers:
 
 from dotenv import load_dotenv
 load_dotenv()
+
+
 
 # ================================
 # Standard Library Imports
@@ -73,7 +87,8 @@ ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png"}
 # ================================
 engine = WorkflowEngine(registry)
 
-# NOTE: In-memory storage (replace with DB in production)
+# In-memory storage 
+
 workflows_db = {}
 
 

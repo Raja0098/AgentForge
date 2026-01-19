@@ -30,7 +30,7 @@
 
         <line
           v-for="(conn, i) in connections"
-          :key="i"
+          :key="`${conn.source}-${conn.target}-${i}`"
           class="connection-line"
           marker-end="url(#arrowhead)"
           :x1="getConnectionPoints(conn).x1"
@@ -58,6 +58,7 @@
             v-if="node.subtype !== 'input' && node.subtype !== 'output'"
             class="btn-node-delete"
             @click.stop="deleteNode(node.id)"
+            title="Delete node"
           >
             ✕
           </button>
@@ -173,11 +174,45 @@
             </div>
           </template>
 
+          <!-- LLM WITH TOOLS NODE -->
+          <template v-else-if="node.subtype === 'llm_tools'">
+            <div class="config-field">
+              <label class="input-label">Prompt</label>
+              <textarea
+                class="flowchart-textarea"
+                rows="2"
+                placeholder="Enter prompt..."
+                :value="node.config.prompt || ''"
+                @input="updateConfig(node.id, 'prompt', $event.target.value)"
+              />
+            </div>
+
+            <div class="config-field">
+              <label class="input-label">
+                <input
+                  type="checkbox"
+                  :checked="node.config.enable_tools !== false"
+                  @change="updateConfig(node.id, 'enable_tools', $event.target.checked)"
+                  style="margin-right: 0.5rem;"
+                />
+                Enable Tools
+              </label>
+            </div>
+          </template>
+
           <!-- WEB SEARCH NODE -->
           <template v-else-if="node.subtype === 'web_search'">
             <div class="auto-process">
               <span class="auto-icon">🔍</span>
               <span>Searches the web automatically</span>
+            </div>
+          </template>
+
+          <!-- DOCUMENT EXTRACTOR NODE -->
+          <template v-else-if="node.subtype === 'document_extractor'">
+            <div class="auto-process">
+              <span class="auto-icon">📄</span>
+              <span>Extracts text from documents</span>
             </div>
           </template>
 
@@ -216,7 +251,7 @@ const selectedTemplate = computed(() => store.state.selectedTemplate)
 
 /* ================= Layout Constants ================= */
 const NODE_WIDTH = 380
-const NODE_HEIGHT = 280  // Fixed height for all nodes
+const NODE_HEIGHT = 280
 const GAP = 80
 const START_Y = 120
 
@@ -225,23 +260,25 @@ const centerX = computed(() => {
   return canvas.value.clientWidth / 2 - NODE_WIDTH / 2
 })
 
-const getNodeY = (index) =>
-  START_Y + index * (NODE_HEIGHT + GAP)
+// FIXED: Calculate Y position based on current array index (no gaps)
+const getNodeY = (index) => START_Y + index * (NODE_HEIGHT + GAP)
 
 /* ================= Helpers ================= */
 const getNodeIcon = (node) => ({
   input: '📥',
   output: '📤',
   llm: '🤖',
+  llm_tools: '🔧🤖',
   summarizer: '📝',
   guardrail: '🛡️',
-  web_search: '🔍'
+  web_search: '🔍',
+  document_extractor: '📄'
 }[node.subtype] || '⚙️')
 
 const getNodeClass = (node) => ({
   'node-input': node.subtype === 'input',
   'node-output': node.subtype === 'output',
-  'node-llm': node.subtype === 'llm',
+  'node-llm': node.subtype === 'llm' || node.subtype === 'llm_tools',
   'node-tool': node.type === 'tool'
 })
 
@@ -266,7 +303,7 @@ const getConnectionPoints = (conn) => {
 const addNode = async () => {
   if (!selectedTemplate.value) return
 
-  // Auto-add Input node
+  // Auto-add Input node if workflow is empty
   if (nodes.value.length === 0) {
     store.commit('ADD_NODE', {
       id: 'input_node',
@@ -274,12 +311,18 @@ const addNode = async () => {
       subtype: 'input',
       name: 'Input',
       position: null,
-      config: { value: '' }
+      config: { input_type: 'text', value: '' }
     })
   }
 
-  // Capture previous node BEFORE adding new one
-  const previousNode = nodes.value[nodes.value.length - 1]
+  // Get the last node (before adding new one)
+  const lastNode = nodes.value[nodes.value.length - 1]
+
+  // If last node is already an output, don't add anything
+  if (lastNode && lastNode.subtype === 'output') {
+    alert('⚠️ Workflow already has an Output node. Please delete it first to add more nodes.')
+    return
+  }
 
   const newNode = {
     id: `node_${Date.now()}`,
@@ -292,14 +335,34 @@ const addNode = async () => {
 
   store.commit('ADD_NODE', newNode)
 
-  // ⏳ Wait for DOM to update
   await nextTick()
 
-  // Connect after DOM is ready
-  if (previousNode) {
+  // Connect to previous node
+  if (lastNode) {
     store.commit('ADD_CONNECTION', {
-      source: previousNode.id,
+      source: lastNode.id,
       target: newNode.id
+    })
+  }
+
+  // Auto-add Output node if the selected template was NOT output
+  if (selectedTemplate.value.type !== 'output') {
+    const outputNode = {
+      id: `output_${Date.now()}`,
+      type: 'output',
+      subtype: 'output',
+      name: 'Output',
+      position: null,
+      config: {}
+    }
+
+    store.commit('ADD_NODE', outputNode)
+
+    await nextTick()
+
+    store.commit('ADD_CONNECTION', {
+      source: newNode.id,
+      target: outputNode.id
     })
   }
 
@@ -312,7 +375,13 @@ const updateConfig = (nodeId, key, value) => {
 }
 
 const deleteNode = (id) => {
-  if (confirm('Delete this node?')) {
+  const node = nodes.value.find(n => n.id === id)
+  
+  if (!node) return
+
+  const confirmMsg = `Delete "${node.name}"?\n\nThis will reconnect surrounding nodes automatically.`
+  
+  if (confirm(confirmMsg)) {
     store.commit('DELETE_NODE', id)
     store.dispatch('saveWorkflow')
   }
@@ -341,15 +410,13 @@ const handleFileUpload = async (nodeId, event) => {
     alert(`✅ File uploaded: ${file.name}`)
   } catch (err) {
     console.error(err)
-    alert('❌ File upload failed')
+    alert('❌ File upload failed: ' + err.message)
   }
 }
 </script>
 
 <style>
-/* =====================================================
-   CANVAS LAYOUT
-   ===================================================== */
+/* All your existing CSS styles remain the same */
 .canvas-container {
   flex: 1;
   background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
@@ -364,9 +431,6 @@ const handleFileUpload = async (nodeId, event) => {
   padding: 2rem 0 150px 0;
 }
 
-/* =====================================================
-   WORKFLOW HEADER
-   ===================================================== */
 .workflow-name-badge {
   position: absolute;
   top: 1.5rem;
@@ -388,9 +452,6 @@ const handleFileUpload = async (nodeId, event) => {
   font-size: 1.1rem;
 }
 
-/* =====================================================
-   ADD NODE HINT
-   ===================================================== */
 .canvas-hint {
   position: sticky;
   top: 1.5rem;
@@ -424,9 +485,6 @@ const handleFileUpload = async (nodeId, event) => {
   50% { transform: translateY(-4px); }
 }
 
-/* =====================================================
-   CONNECTIONS (ARROWS)
-   ===================================================== */
 .connections-layer {
   position: absolute;
   top: 0;
@@ -446,9 +504,6 @@ const handleFileUpload = async (nodeId, event) => {
   marker-end: url(#arrowhead);
 }
 
-/* =====================================================
-   FLOWCHART NODES - FIXED SIZE
-   ===================================================== */
 .flowchart-node {
   position: absolute;
   width: 380px;
@@ -467,18 +522,12 @@ const handleFileUpload = async (nodeId, event) => {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
 
-/* =====================================================
-   NODE TYPES (SHAPES + COLORS)
-   ===================================================== */
-
-/* Input */
 .node-input {
   border-color: #10b981;
   border-radius: 20px;
   background: linear-gradient(to bottom, #ffffff, #ecfdf5);
 }
 
-/* LLM / Agent */
 .node-llm,
 .node-agent {
   border-color: #8b5cf6;
@@ -486,14 +535,12 @@ const handleFileUpload = async (nodeId, event) => {
   background: linear-gradient(to bottom, #ffffff, #faf5ff);
 }
 
-/* Tool */
 .node-tool {
   border-color: #f59e0b;
   border-radius: 10px;
   background: linear-gradient(to bottom, #ffffff, #fffbeb);
 }
 
-/* Output */
 .node-output {
   border-color: #3b82f6;
   border-radius: 6px;
@@ -501,9 +548,6 @@ const handleFileUpload = async (nodeId, event) => {
   background: linear-gradient(to bottom, #ffffff, #eff6ff);
 }
 
-/* =====================================================
-   NODE HEADER
-   ===================================================== */
 .flowchart-node-header {
   display: flex;
   align-items: center;
@@ -525,7 +569,6 @@ const handleFileUpload = async (nodeId, event) => {
   color: #0f172a;
 }
 
-/* Delete Button */
 .btn-node-delete {
   width: 30px;
   height: 30px;
@@ -539,15 +582,14 @@ const handleFileUpload = async (nodeId, event) => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: all 0.2s;
 }
 
 .btn-node-delete:hover {
   background: #fca5a5;
+  transform: scale(1.1);
 }
 
-/* =====================================================
-   NODE BODY - SCROLLABLE
-   ===================================================== */
 .flowchart-node-body {
   padding: 1rem 1.25rem;
   flex: 1;
@@ -555,7 +597,6 @@ const handleFileUpload = async (nodeId, event) => {
   overflow-x: hidden;
 }
 
-/* Custom scrollbar */
 .flowchart-node-body::-webkit-scrollbar {
   width: 6px;
 }
@@ -592,7 +633,6 @@ const handleFileUpload = async (nodeId, event) => {
   letter-spacing: 0.025em;
 }
 
-/* Inputs */
 .flowchart-input,
 .flowchart-select,
 .flowchart-textarea {
@@ -603,6 +643,7 @@ const handleFileUpload = async (nodeId, event) => {
   font-size: 0.8rem;
   font-family: inherit;
   background: white;
+  transition: all 0.2s;
 }
 
 .flowchart-input:focus,
@@ -619,9 +660,6 @@ const handleFileUpload = async (nodeId, event) => {
   max-height: 120px;
 }
 
-/* =====================================================
-   AUTO PROCESS BLOCK
-   ===================================================== */
 .auto-process {
   display: flex;
   align-items: center;
@@ -648,9 +686,6 @@ const handleFileUpload = async (nodeId, event) => {
   flex-shrink: 0;
 }
 
-/* =====================================================
-   FILE UPLOAD
-   ===================================================== */
 .file-upload-zone {
   position: relative;
 }

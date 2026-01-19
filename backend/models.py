@@ -20,8 +20,8 @@ class WorkflowNode(BaseModel):
     Represents a single node in the workflow graph.
     """
     id: str
-    type: str               # agent | tool | special
-    subtype: str            # llm, input, output, web_search, etc.
+    type: str             
+    subtype: str            
     name: str
 
     config: Dict[str, Any] = Field(default_factory=dict)

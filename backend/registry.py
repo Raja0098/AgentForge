@@ -43,7 +43,7 @@ class NodeRegistry:
     """
 
     def __init__(self):
-        # LLM function (Gemini)
+        
         self.llm = gemini_generate
 
         # ----------------------------
@@ -107,7 +107,7 @@ class NodeRegistry:
         special: list = []
 
         metadata_map = {
-            # Special / boundary nodes
+
             "input": {
                 "type": "input",
                 "name": "Input Source",
@@ -163,17 +163,16 @@ class NodeRegistry:
         }
 
         for subtype, meta in metadata_map.items():
-            if subtype in ("input", "output"):
-                special.append(meta)
-            elif subtype in ("guardrail", "summarizer", "llm", "llm_tools"):
+            if subtype in ("guardrail", "summarizer", "llm", "llm_tools"):
                 agents.append(meta)
+            
             else:
                 tools.append(meta)
 
         return {
             "agents": agents,
             "tools": tools,
-            "special": special,
+            
         }
 
 
